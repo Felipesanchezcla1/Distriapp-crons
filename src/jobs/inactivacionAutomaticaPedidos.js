@@ -5,7 +5,7 @@ export const inactivacionAutomaticaPedidos = async () => {
         console.log('Respuesta', response.data)
         return response
     }catch (error) {
-        console.log('Un error papulince', error);
+        console.log('Error en el proceso de inactivación de pedidos', error);
         throw error;
     }
 };
