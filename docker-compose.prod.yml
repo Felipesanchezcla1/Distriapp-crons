@@ -1,0 +1,10 @@
+services:
+  scheduler:
+    image: ghcr.io/Felipesanchezcla1/Distriapp-crons:scheduler-latest
+    container_name: scheduler
+    env_file: .env
+    volumes:
+      - ./logs:/app/logs
+    ports:
+      - "3000:3000"
+    restart: unless-stopped

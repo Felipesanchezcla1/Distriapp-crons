@@ -1,0 +1,10 @@
+services:
+  scheduler:
+    build: .
+    container_name: scheduler
+    env_file: .env
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
