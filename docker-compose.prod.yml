@@ -1,6 +1,6 @@
 services:
   scheduler:
-    image: ghcr.io/Felipesanchezcla1/distriapp-crons:scheduler-latest
+    image: ghcr.io/felipesanchezcla1/distriapp-crons:scheduler-latest
     container_name: scheduler
     env_file: .env
     volumes:

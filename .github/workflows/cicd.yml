@@ -29,10 +29,11 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ghcr.io/${{ github.repository_owner }}/distriapp-crons
           tags: |
             type=raw,value=scheduler-latest
             type=sha,format=short,prefix=scheduler-
+
 
       - name: Build & Push
         uses: docker/build-push-action@v6
