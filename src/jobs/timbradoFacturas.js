@@ -1,6 +1,6 @@
 import logger from '../libs/logger.js';
 import {http, dailyKey, AbortController} from '../libs/httpClient.js';
-import {loginAmdGetDjangoApp} from "../utils/Auth.js";
+import {loginAndGetDjangoApp} from "../utils/Auth.js";
 
 const ENDPOINT = 'cdi/factura/timbrarFacturas/';
 
@@ -18,7 +18,7 @@ export const timbrarFacturasAlegra = async () => {
     }
     try {
         logger.info('Iniciando timbrado de facturas');
-        const token = await loginAmdGetDjangoApp(userNameFact, passwordFact);
+        const token = await loginAndGetDjangoApp(userNameFact, passwordFact);
         if (!token) {
             logger.error('No se pudo obtener el token para timbrar facturas');
             return;

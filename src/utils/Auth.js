@@ -3,7 +3,7 @@ import logger from "../libs/logger.js";
 
 const ENDPOINT = 'login/';
 
-export const loginAmdGetDjangoApp = async (userName, password) => {
+export const loginAndGetDjangoApp = async (userName, password) => {
     const controller = new AbortController();
     const HARD_TIMEOUT_MS = Number(process.env.HARD_TIMEOUT_MS || 15000);
     const hardTimeout = setTimeout(() => controller.abort(), HARD_TIMEOUT_MS);
