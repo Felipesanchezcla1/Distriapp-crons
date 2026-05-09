@@ -24,7 +24,7 @@ export const inactivacionAutomaticaPedidos = async () => {
     } catch (error) {
         logger.error({
             endpoint: ENDPOINT,
-            reason: error.message,
+            reason: error?.response?.data?.msg || error.message,
             aborted: error.name === 'AbortError'
         }, 'Proceso de inactivación fallo');
 
