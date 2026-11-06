@@ -63,6 +63,11 @@ jobs:
             set -e
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USER }}" --password-stdin
             cd /var/www/html/drosalud-app/Distriapp-crons
+            
+            # sincroniza el repo con el mismo commit con el que se construyó la imagen
+            git fetch --prune origin
+            git reset --hard ${{ github.sha }}
+            
             # asegúrate de que estos archivos existen en el droplet
             test -f docker-compose.prod.yml
             test -f .env
