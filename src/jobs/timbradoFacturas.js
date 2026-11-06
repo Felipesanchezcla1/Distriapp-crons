@@ -11,7 +11,6 @@ export const timbrarFacturasAlegra = async () => {
     const idempotencyKey = dailyKey('timbrado-facturas');
     const userNameFact = process.env.USERNAME_TIMBRADO;
     const passwordFact = process.env.PASSWORD_TIMBRADO;
-    console.log(userNameFact, passwordFact)
     if (!userNameFact || !passwordFact) {
         logger.error('No se encuentran las credenciales para timbrar facturas');
         return;

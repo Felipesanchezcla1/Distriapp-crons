@@ -1,5 +1,6 @@
 import {http, dailyKey, AbortController} from '../libs/httpClient.js';
 import logger from "../libs/logger.js";
+import {describirErrorHttp} from "./funciones.js";
 
 const ENDPOINT = 'login/';
 
@@ -26,13 +27,14 @@ export const loginAndGetDjangoApp = async (userName, password) => {
         }
         return null
     } catch (error) {
+
         logger.error({
             endpoint: ENDPOINT,
-            reason: error.message,
+            reason: describirErrorHttp(error, true),
             aborted: error.name === 'AbortError'
         }, 'Proceso de inicio de sesión fallido');
 
-        return null
+        throw error
     } finally {
         clearTimeout(hardTimeout);
     }

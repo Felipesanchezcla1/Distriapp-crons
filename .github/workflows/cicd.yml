@@ -3,6 +3,9 @@ name: CI/CD Scheduler
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
+  schedule:
+      - cron: '0 8 * * 1'
 
 jobs:
   build-and-push:
@@ -40,6 +43,7 @@ jobs:
         with:
           context: .
           push: true
+          pull: true
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -57,7 +61,7 @@ jobs:
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
             set -e
-            docker login ghcr.io -u ${{ secrets.GHCR_USER }} -p ${{ secrets.GHCR_TOKEN }}
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USER }}" --password-stdin
             cd /var/www/html/drosalud-app/Distriapp-crons
             # asegúrate de que estos archivos existen en el droplet
             test -f docker-compose.prod.yml
@@ -65,3 +69,16 @@ jobs:
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d --remove-orphans --force-recreate
             docker image prune -f
+            
+            # verifica que el scheduler esté healthy
+            for i in $(seq 1 18); do
+              STATUS=$(docker inspect --format '{{.State.Health.Status}}' scheduler)
+              if [ "$STATUS" = "healthy" ]; then
+                echo "Scheduler healthy"
+                exit 0
+              fi
+              sleep 10
+            done
+            echo "El scheduler no quedó healthy (estado: $STATUS)"
+            docker logs --tail 50 scheduler
+            exit 1

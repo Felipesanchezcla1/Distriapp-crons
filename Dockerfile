@@ -1,27 +1,27 @@
-# ====== Dependencias (instalación) ======
+# ====== Dependencias ======
 FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # ====== Runtime ======
 FROM node:22-alpine
-ENV NODE_ENV=production
+ENV NODE_ENV=production \
+    TZ=America/Bogota
 WORKDIR /app
 
-# Copia node_modules y el código
-COPY --from=deps /app/node_modules /app/node_modules
-COPY . .
+RUN apk upgrade --no-cache && apk add --no-cache tini tzdata
 
-# Carpeta de logs dentro del proyecto (se montará un volumen en /app/logs)
-RUN mkdir -p /app/logs
+COPY --from=deps --chown=node:node /app/node_modules ./node_modules
+COPY --chown=node:node . .
+RUN mkdir -p /app/logs && chown node:node /app/logs
 
-# Puerto del healthcheck (ajústalo si usas otro)
-EXPOSE 3000
+USER node
 
-# Healthcheck simple contra /health
-HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
-  CMD wget -qO- http://localhost:3000/health || exit 1
+# El scheduler escribe /tmp/heartbeat en cada tick (cada 5 min).
+# Si pasan más de 12 min sin latido, queda unhealthy.
+HEALTHCHECK --interval=60s --timeout=5s --start-period=30s --retries=3 \
+  CMD node -e "try{const t=require('fs').statSync('/tmp/heartbeat').mtimeMs;process.exit(Date.now()-t<720000?0:1)}catch{process.exit(1)}"
 
-# Ejecuta el scheduler
+ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["node", "src/index.js"]
