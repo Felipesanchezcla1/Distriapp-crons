@@ -52,6 +52,9 @@ jobs:
     name: Deploy on Droplet
     needs: build-and-push
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
     steps:
       - name: SSH into Droplet and deploy
         uses: appleboy/ssh-action@v1.0.3
@@ -61,7 +64,7 @@ jobs:
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
             set -e
-            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USER }}" --password-stdin
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
             cd /var/www/html/drosalud-app/Distriapp-crons
             
             # sincroniza el repo con el mismo commit con el que se construyó la imagen
